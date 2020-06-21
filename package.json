@@ -1,0 +1,28 @@
+{
+  "name": "tether-nuxt",
+  "version": "1.0.0",
+  "description": "My flawless Nuxt.js project",
+  "author": "Denis Bachtiar",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.11.0",
+    "nuxt": "^2.0.0",
+    "nuxt-gmaps": "^1.2.3",
+    "swiper": "^5.4.2",
+    "vue-awesome-swiper": "^4.1.1",
+    "vue-fragment": "^1.5.1",
+    "vue2-google-maps": "^0.10.7",
+    "x5-gmaps": "^0.3.9"
+  },
+  "devDependencies": {
+    "@iconify/vue": "^1.0.1",
+    "@nuxtjs/moment": "^1.6.1",
+    "@nuxtjs/vuetify": "^1.11.2"
+  }
+}
