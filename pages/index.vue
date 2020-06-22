@@ -3,7 +3,7 @@
   <p v-if="loading">LOADING.....</p>
   <v-app v-else>
   <swiper class="swiper">
-    <swiper-slide v-for="(item,i) in apiData.image" :key="i" :style="{'background-image': 'url(' + item.image + ')'}"></swiper-slide>
+    <swiper-slide v-for="(item,i) in apiData.image" :key="i" :style="{'background-image': 'url(' + item.image + ')'}" @click.native="viewerShow(i)"></swiper-slide>
   </swiper>
   <v-container class="">
     <div class="d-flex mt-2 align-center">
@@ -30,7 +30,7 @@
       <p class="gray-text"><span class="iconify" data-icon="ic:round-comment" data-inline="false"></span><span class="ml-2 pop sm">{{apiData.comment}}</span></p>
     </div>
     <div class="ml-auto">
-      <p class="gray-text"><span class="iconify " data-icon="fa-solid:share-alt" data-inline="false"></span><span class="ml-2 pop sm">{{apiData.share}}</span></p>
+      <p class="gray-text" @click="sheetNow()"><span class="iconify" data-icon="fa-solid:share-alt" data-inline="false"></span><span class="ml-2 pop sm">{{apiData.share}}</span></p>
     </div>
   </v-container>
   <hr class="mt-2 mb-2">
@@ -52,8 +52,8 @@
       >
       </GMapMarker>
     </GMap>
-    <p v-if="apiData.city_id != 0">{{apiData.address}}</p>
-    <hr class="mt-9 mb-2">
+    <p v-if="apiData.city_id != 0">{{this.address}}</p>
+    <hr class="mt-3 mb-2">
     <p class="sbold lg mb-2">Peserta <span class="float-right">{{apiData.user_joined}}/{{userJoined}} Slot</span></p>
       <div class="d-flex align-center">
         <div style="width: 46px" class="ml-2" v-for="(item, index) in apiData.listjoined" :key="index">
@@ -70,11 +70,25 @@
     <p>{{apiData.note.note}}</p>
   </v-container>
   <div style="background-color: rgb(245, 245, 245);" class="pt-2"></div>
+  <!--COMMENT COMPONENT-->
+  <Comment :listComment="apiData.listcomment"/>
+  <BottomSheetShare/>
+  <image-viewer-vue
+        v-if="imageViewerFlag" 
+        @closeImageViewer="imageViewerFlag = false" 
+        :imgUrlList="imageList"
+        title="image"
+        :index="currentIndex"
+        :closable="true"
+        :cyclical="false">
+  </image-viewer-vue>
   </v-app>
 </fragment>
 </template>
 
 <script>
+import Comment from '@/components/Comment'
+import BottomSheetShare from '@/components/BottomSheetShare'
 import { Swiper, SwiperSlide} from 'vue-awesome-swiper'
 import 'swiper/css/swiper.css'
 
@@ -86,15 +100,29 @@ export default {
   // },
   components: {
     Swiper,
-    SwiperSlide
+    SwiperSlide,
+    Comment,
+    BottomSheetShare
   },
   data () {
       return {
         loading: true,
         apiData: {},
+        address: null,
+        currentIndex: null,
+        imageViewerFlag: false
       }
     },
+    created() {
+      // this.geocoder
+    },
     computed: {
+      geocoder: function() {
+        this.$axios.$get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.latlng.lat},${this.latlng.lng}&key=AIzaSyDaYbdWKAZgyTRy_rFzr6UdRGNY_Emu3VE`).then(response => {
+          // console.log(response.results[0].formatted_address)
+          this.address = response.results[0].formatted_address
+        })
+      },
       contentBR: function() {
         return String(this.apiData.content).replace(/\n/g, "<br/>")
       },
@@ -116,14 +144,32 @@ export default {
         else {
           return this.apiData.slot
         }
+      },
+      imageList: function() {
+        var img = this.apiData.image.map((val) => {
+          return val.image
+        })
+        return img
+      }
+    },
+    methods: {
+      sheetNow() {
+          const thisBss = this.$root.$refs.BottomSheetShare
+          thisBss.sheet = !thisBss.sheet
+          // alert(sheet)
+      },
+      viewerShow(i) {
+          this.imageViewerFlag = true
+          this.currentIndex = i
       }
     },
     mounted() {
-      this.$axios.$get('http://prodapi.tether.co.id:8182/api/activity/Nobar-first-match-Liverpool-setelah-pandemi1591881147500')
+      this.$axios.$get('http://prodapi.tether.co.id:8182/api/activity/Ajakan-main-Games-TopWar-Server-5551592067238803')
       .then(response => {
         // console.log(response.data)
         this.apiData = response.data
         this.loading = false
+        this.geocoder
       }).catch(error => {
         if (this.$axios.isCancel(error)) {
           console.log('Request canceled', error)
