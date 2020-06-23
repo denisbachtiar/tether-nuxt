@@ -2,9 +2,11 @@
   <fragment>
   <p v-if="loading">LOADING.....</p>
   <v-app v-else>
-  <swiper class="swiper">
+  <swiper class="swiper" :options="swiperOption">
     <swiper-slide v-for="(item,i) in apiData.image" :key="i" :style="{'background-image': 'url(' + item.image + ')'}" @click.native="viewerShow(i)"></swiper-slide>
+    <div class="swiper-pagination swiper-pagination-white" slot="pagination"></div>
   </swiper>
+  <p class="view"><span class="iconify" data-icon="ic:round-remove-red-eye" data-inline="false"></span> {{apiData.view}}</p>
   <v-container class="">
     <div class="d-flex mt-2 align-center">
       <div style="width: 50%; padding: 10px 10px 10px 0px; border-right: 1px solid rgb(245, 245, 245)">
@@ -56,20 +58,20 @@
     <hr class="mt-3 mb-2">
     <p class="sbold lg mb-2">Peserta <span class="float-right">{{apiData.user_joined}}/{{userJoined}} Slot</span></p>
       <div class="d-flex align-center">
-        <div style="width: 46px" class="ml-2" v-for="(item, index) in apiData.listjoined" :key="index">
+        <div style="width: 46px" class="ml-2" v-for="(item, index) in apiData.listjoined.slice(0,6)" :key="index">
           <img :src="item.user.avatar" height="45" width="100%" class="round"></img>
-          <p class="pop light text-gray-100 xs mt-0 text-center">{{item.user.username}}</p>
+          <p class="pop light text-gray-100 xs mt-0 text-center">{{item.user.username.length <= 9 ? item.user.username:item.user.username.substring(0, 7)+'...'}}</p>
         </div>
         <a href="https://play.google.com/store/apps/details?id=com.b5g.tether" style="width: 46px;" class="ml-2"><span class="iconify joined" :data-icon="apiData.user_joined == 0 ? 'fa-solid:users':'bx:bxs-grid'" data-inline="false"></span><p class="light pop text-gray-100 xs mt-2 text-center" v-text="apiData.user_joined == 0 ? 'belum ada':'see all'"></p></a>  
       </div>
     <hr class="mt-3 mb-3">
   </v-container>
-  <div style="background-color: rgb(245, 245, 245);" class="pt-2"></div>
-  <v-container style="background-color: #FFF7E5;" class="pt-4 pb-4">
-    <p class="sbold lg mb-2">Notes</p>
+  <div style="background-color: rgb(245, 245, 245);" class="pt-1"></div>
+  <v-container style="background-color: #FFF7E5;" class="pt-6 pb-6">
+    <p class="sbold lg mb-1">Notes</p>
     <p>{{apiData.note.note}}</p>
   </v-container>
-  <div style="background-color: rgb(245, 245, 245);" class="pt-2"></div>
+  <div style="background-color: rgb(245, 245, 245);" class="pt-1"></div>
   <!--COMMENT COMPONENT-->
   <Comment :listComment="apiData.listcomment"/>
   <BottomSheetShare/>
@@ -82,6 +84,15 @@
         :closable="true"
         :cyclical="false">
   </image-viewer-vue>
+  <v-bottom-navigation style="left: unset; color: white;" class="align-center" 
+  :fixed="true" 
+  background-color="#6197E1">
+    <div>
+        <p class="lg bold">{{userJoined}}<span class="ml-1 light">Slot</span></p>
+        <p class="lg bold">{{apiData.user_joined}}<span class="ml-1 light">Joined</span></p>
+    </div>
+    <a class="ml-auto" href="https://play.google.com/store/apps/details?id=com.b5g.tether" style="width: 30%;"><img src="/playstore.png" style="vertical-align: middle;" width="100%"></a>
+  </v-bottom-navigation>
   </v-app>
 </fragment>
 </template>
@@ -110,7 +121,13 @@ export default {
         apiData: {},
         address: null,
         currentIndex: null,
-        imageViewerFlag: false
+        imageViewerFlag: false,
+        swiperOption: {
+          pagination: {
+            el: '.swiper-pagination',
+            dynamicBullets: true
+          }
+        }
       }
     },
     created() {
@@ -151,6 +168,7 @@ export default {
     methods: {
       sheetNow() {
           const thisBss = this.$root.$refs.BottomSheetShare
+          thisBss.title = this.apiData.title
           thisBss.sheet = !thisBss.sheet
           // alert(sheet)
       },
@@ -160,7 +178,8 @@ export default {
       }
     },
     mounted() {
-      this.$axios.$get('http://prodapi.tether.co.id:8182/api/activity/Nobar-first-match-Liverpool-setelah-pandemi1591881147500')
+        const urlID = this.$nuxt.$route.params.id
+      this.$axios.$get(`http://prodapi.tether.co.id:8182/api/activity/${urlID}`)
       .then(response => {
         // console.log(response.data)
         this.apiData = response.data
@@ -178,6 +197,13 @@ export default {
 </script>
 
 <style lang="scss">
+.view {
+    position: absolute;
+    z-index: 4;
+    color: white;
+    right: 10px;
+    top: 10px;
+}
 .GMap__Wrapper {
   height: 100px;
 }

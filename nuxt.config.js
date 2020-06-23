@@ -56,6 +56,7 @@ export default {
       //you can use libraries: ['places']
     }],
     '@nuxtjs/axios',
+    'vue-social-sharing/nuxt'
   ],
   axios: {
     // proxyHeaders: false

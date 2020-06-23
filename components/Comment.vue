@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <v-container class="pb-3">
+        <v-container class="pb-3 mb-12">
             <p class="sbold mt-2 mb-3">Komentar</p>
                 <div class="d-flex mb-2" v-for="(item, index) in listComment" :key="index">
                     <img :src="item.user.avatar" height="27" width="27" class="round"></img>

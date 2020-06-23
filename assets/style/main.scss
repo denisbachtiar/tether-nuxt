@@ -75,7 +75,7 @@ hr {
 
 .iconify {
   vertical-align: middle;
-  font-size: 16px;
+  font-size: 18px;
   &.joined {
     padding: 12px;
     height: 45px;
@@ -84,4 +84,9 @@ hr {
     color: white;
     background-color: #ececec;
   }
+}
+
+.v-item-group.v-bottom-navigation {
+  padding: 10px;
+  max-width: 430px;
 }
