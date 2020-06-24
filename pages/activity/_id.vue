@@ -1,6 +1,8 @@
 <template>
   <fragment>
-  <p v-if="loading">LOADING.....</p>
+  <v-app v-if="loading">
+    <Skeleton/>
+  </v-app>
   <v-app v-else>
   <swiper class="swiper" :options="swiperOption">
     <swiper-slide v-for="(item,i) in apiData.image" :key="i" :style="{'background-image': 'url(' + item.image + ')'}" @click.native="viewerShow(i)"></swiper-slide>
@@ -40,6 +42,7 @@
     <p class="mb-2 sbold lg">{{apiData.title}}</p>
     <p class="mb-6" v-html="contentBR"></p>
     <!--MAPS-->
+    <p class="xs" v-if="apiData.city_id == 0" style="color: rgb(97, 151, 225)">ONLINE ACTIVITY</p>
     <p class="mb-2 sbold lg" v-text="apiData.city_id == 0 ? 'Link Terkait':'Lokasi'"></p>
     <div style="background-color: #f2f2f2;
     padding: 10px;" v-if="apiData.city_id == 0"><p><a :href="apiData.link">{{apiData.link}}</a></p></div>
@@ -67,7 +70,7 @@
     <hr class="mt-3 mb-3">
   </v-container>
   <div style="background-color: rgb(245, 245, 245);" class="pt-1"></div>
-  <v-container style="background-color: #FFF7E5;" class="pt-6 pb-6">
+  <v-container :style="{'background-color': colorHex}" class="pt-6 pb-6">
     <p class="sbold lg mb-1">Notes</p>
     <p>{{apiData.note.note}}</p>
   </v-container>
@@ -100,6 +103,7 @@
 <script>
 import Comment from '@/components/Comment'
 import BottomSheetShare from '@/components/BottomSheetShare'
+import Skeleton from '@/components/Skeleton'
 import { Swiper, SwiperSlide} from 'vue-awesome-swiper'
 import 'swiper/css/swiper.css'
 
@@ -113,7 +117,8 @@ export default {
     Swiper,
     SwiperSlide,
     Comment,
-    BottomSheetShare
+    BottomSheetShare,
+    Skeleton
   },
   data () {
       return {
@@ -136,7 +141,6 @@ export default {
     computed: {
       geocoder: function() {
         this.$axios.$get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.apiData.lat},${this.apiData.long}&key=AIzaSyDaYbdWKAZgyTRy_rFzr6UdRGNY_Emu3VE`).then(response => {
-          // console.log(response.results[0].formatted_address)
           this.address = response.results[0].formatted_address
         })
       },
@@ -163,6 +167,15 @@ export default {
           return val.image
         })
         return img
+      },
+      colorHex: function() {
+        const colorArray = []
+        for(let i=0; i<4; i++){
+            colorArray.push(this.apiData.note.color % 256)
+            this.apiData.note.color>>>=8
+        }
+        const alpha = colorArray.pop() / 255
+        return `rgba(${colorArray.reverse()},${alpha})`
       }
     },
     methods: {
@@ -179,19 +192,19 @@ export default {
     },
     mounted() {
         const urlID = this.$nuxt.$route.params.id
-      this.$axios.$get(`http://prodapi.tether.co.id:8182/api/activity/${urlID}`)
-      .then(response => {
-        // console.log(response.data)
-        this.apiData = response.data
-        this.loading = false
-        this.geocoder
-      }).catch(error => {
-        if (this.$axios.isCancel(error)) {
-          console.log('Request canceled', error)
-        } else {
-          // handle error
-        }
-      })
+        this.$axios.$get(`http://prodapi.tether.co.id:8182/api/activity/${urlID}`)
+        .then(response => {
+            // console.log(response.data)
+            this.apiData = response.data
+            this.loading = false
+            this.geocoder
+        }).catch(error => {
+            if (this.$axios.isCancel(error)) {
+            console.log('Request canceled', error)
+            } else {
+            // handle error
+            }
+        })
     },
 }
 </script>
