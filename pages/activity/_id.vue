@@ -38,7 +38,7 @@
     </div>
   </v-container>
   <hr class="mt-2 mb-2">
-  <v-container>
+  <v-container class="mt-4">
     <p class="mb-2 sbold lg">{{apiData.title}}</p>
     <p class="mb-6" v-html="contentBR"></p>
     <!--MAPS-->
@@ -70,7 +70,7 @@
     <hr class="mt-3 mb-3">
   </v-container>
   <div style="background-color: rgb(245, 245, 245);" class="pt-1"></div>
-  <v-container :style="{'background-color': colorHex}" class="pt-6 pb-6">
+  <v-container v-if="apiData.note.activity_note_id != 0" :style="{'background-color': colorHex}" class="pt-6 pb-6">
     <p class="sbold lg mb-1">Notes</p>
     <p>{{apiData.note.note}}</p>
   </v-container>
@@ -197,12 +197,15 @@ export default {
             // console.log(response.data)
             this.apiData = response.data
             this.loading = false
-            this.geocoder
+            if (this.apiData.city_id != 0) {
+              this.geocoder
+            }
         }).catch(error => {
             if (this.$axios.isCancel(error)) {
             console.log('Request canceled', error)
             } else {
             // handle error
+            this.$router.push('/notfound')
             }
         })
     },
