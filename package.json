@@ -14,7 +14,7 @@
     "@nuxtjs/axios": "^5.11.0",
     "@pderas/vue2-geocoder": "^1.1.0",
     "image-viewer-vue": "^2.0.6",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.15.8",
     "nuxt-gmaps": "^1.2.3",
     "swiper": "^5.4.2",
     "vue-awesome-swiper": "^4.1.1",
